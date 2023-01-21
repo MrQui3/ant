@@ -1,13 +1,15 @@
-import home
 import random
 import pygame
+import home
+
 
 class Ant:
-    def __init__(self, screen: pygame.Surface):
-        self.position = (random.randint(10, 590), random.randint(10, 590))
-        self.size = (5, 10)
+    def __init__(self):
         self.rotation = random.randint(0, 359)
         self.speed = 1
         self.color = (255, 0, 0)
-        self.ant = pygame.Rect(self.position[0], self.position[1], 5, 10)
-        self.ant = pygame.transform.rotate(screen, 90)
+        self.ant = pygame.Rect(home.pos[0], home.pos[1], 10, 10)
+        self.target = (random.randint(-200, 200), random.randint(-200, 200))
+
+    def new_target(self):
+        self.target = (random.randint(-200, 200), random.randint(-200, 200))
