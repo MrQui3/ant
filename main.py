@@ -16,6 +16,7 @@ food_cords = (100, 500)
 food_number = 100
 food = []
 walls = []
+home_pheromones = []
 
 # Creating pygame variables
 pygame.init()
@@ -25,6 +26,7 @@ clock = pygame.time.Clock()
 # Creating Ants
 for i in range(ant_number):
     ants.append(ant.Ant())
+
 # Creating Walls
 for wall in home.walls:
     walls.append(pygame.Rect(wall[0] * 20, wall[1] * 20, 20, 20))
@@ -33,6 +35,7 @@ walls.append(pygame.Rect(0, 0, width, 10))
 walls.append(pygame.Rect(0, 0, 10, height))
 walls.append(pygame.Rect(width - 10, 0, 10, height))
 walls.append(pygame.Rect(0, height - 10, width, 10))
+
 # Creating Food
 for i in range(round(food_number/2)):
     for i2 in range(round(food_number/2)):
