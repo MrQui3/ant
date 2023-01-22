@@ -9,9 +9,9 @@ import pheromone_food
 # Creating simulation variables
 ants = []
 FPS = 30
-width = 600
-height = 600
-ant_number = 1000
+width = 900
+height = 900
+ant_number = 200
 food_cords = (100, 500)
 food_number = 100
 food = []
@@ -37,9 +37,9 @@ walls.append(pygame.Rect(width - 10, 0, 10, height))
 walls.append(pygame.Rect(0, height - 10, width, 10))
 
 # Creating Food
-for i in range(round(food_number/2)):
-    for i2 in range(round(food_number/2)):
-        food.append(pygame.Rect(food_cords[0]+i, food_cords[1]+i2, 5, 5))
+for i in range(round(food_number / 2)):
+    for i2 in range(round(food_number / 2)):
+        food.append(pygame.Rect(food_cords[0] + i, food_cords[1] + i2, 5, 5))
 
 running = True
 while running:
@@ -49,9 +49,11 @@ while running:
     screen.fill((219, 149, 44))
     clock.tick(FPS)
 
-    # Drawing Ants
+    # Ants
     for ant in ants:
-        pygame.draw.rect(screen, ant.color, ant.ant)
+        # Drawing Ants
+        pygame.draw.rect(screen, (255, 0, 0), ant.ant)
+        # Moving Ants
         if ant.target[0] > 0:
             ant.ant.move_ip(1, 0)
             ant.target = (ant.target[0] - 1, ant.target[1])
@@ -67,10 +69,17 @@ while running:
 
         if ant.target == (0, 0):
             ant.new_target()
+        # Testing if Ant collides
         if ant.ant.collidelist(walls) != -1:
             ant.target = (-ant.target[0], -ant.target[1])
         if ant.ant.collidelist(food) != -1:
             food.pop(ant.ant.collidelist(food))
+
+        # spreading pheromones
+        if ant.pheromone_time == 0 and ant.having_target is False:
+            home_pheromones.append(pheromone_home.pheromone(ant.ant.x, ant.ant.y))
+            ant.pheromone_time = 30
+        ant.pheromone_time -= 1
 
     # Drawing Home
     pygame.draw.rect(screen, (100, 66, 17), (home.pos[0], home.pos[1], home.size[0], home.size[1]))
@@ -82,6 +91,14 @@ while running:
     # Drawing Food
     for i in food:
         pygame.draw.rect(screen, (0, 255, 0), i)
+
+    # home_pheromones
+    for i in range(len(home_pheromones)):
+        pygame.draw.rect(screen, (0, 0, 255), (home_pheromones[i].position[0], home_pheromones[i].position[1], 2, 2))
+        home_pheromones[i].time -= 1
+
+    home_pheromones = [x for x in home_pheromones if x.time != 0]
+
 
     pygame.display.flip()
 pygame.quit()
