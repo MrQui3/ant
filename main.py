@@ -1,6 +1,4 @@
 import pygame
-from numpy import finfo
-
 import ant
 import home
 import pheromone_home
@@ -11,12 +9,13 @@ ants = []
 FPS = 30
 width = 900
 height = 900
-ant_number = 200
+ant_number = 30
 food_cords = (100, 500)
-food_number = 100
+food_number = 10
 food = []
 walls = []
 home_pheromones = []
+food_pheromones = []
 
 # Creating pygame variables
 pygame.init()
@@ -69,20 +68,34 @@ while running:
 
         if ant.target == (0, 0):
             ant.new_target()
+
         # Testing if Ant collides
         if ant.ant.collidelist(walls) != -1:
             ant.target = (-ant.target[0], -ant.target[1])
-        if ant.ant.collidelist(food) != -1:
+        if ant.ant.collidelist(food) != -1 and ant.having_food is False:
             food.pop(ant.ant.collidelist(food))
+            ant.having_food = True
+            ant.target = (-ant.target[0], -ant.target[1])
+        if ant.ant.colliderect(home.home) is True:
+            ant.having_food = False
 
         # spreading pheromones
-        if ant.pheromone_time == 0 and ant.having_target is False:
-            home_pheromones.append(pheromone_home.pheromone(ant.ant.x, ant.ant.y))
+        if ant.pheromone_time == 0:
+            if ant.having_food:
+                food_pheromones.append(pheromone_food.pheromone(ant.ant.x, ant.ant.y))
+            else:
+                home_pheromones.append(pheromone_home.pheromone(ant.ant.x, ant.ant.y))
             ant.pheromone_time = 30
         ant.pheromone_time -= 1
 
+        # Sensoring pheromones
+        if ant.having_food is False:
+            ant.sensoring_food(food_pheromones)
+
+
+
     # Drawing Home
-    pygame.draw.rect(screen, (100, 66, 17), (home.pos[0], home.pos[1], home.size[0], home.size[1]))
+    pygame.draw.rect(screen, (100, 66, 17), (home.home.x, home.home.y, home.home.size[0], home.home.size[1]))
 
     # Drawing Walls
     for wall in walls:
@@ -93,11 +106,16 @@ while running:
         pygame.draw.rect(screen, (0, 255, 0), i)
 
     # home_pheromones
-    for i in range(len(home_pheromones)):
-        pygame.draw.rect(screen, (0, 0, 255), (home_pheromones[i].position[0], home_pheromones[i].position[1], 2, 2))
-        home_pheromones[i].time -= 1
-
+    for i in home_pheromones:
+        pygame.draw.rect(screen, (0, 0, 255), i.rect)
+        i.time -= 1
     home_pheromones = [x for x in home_pheromones if x.time != 0]
+
+    # food_pheromones
+    for i in food_pheromones:
+        pygame.draw.rect(screen, (0, 255, 0), i.rect)
+        i.time -= 1
+    food_pheromones = [x for x in food_pheromones if x.time != 0]
 
 
     pygame.display.flip()
