@@ -7,16 +7,16 @@ import random
 
 # Creating simulation variables
 ants = []
-FPS = 25
+FPS = 30
 width = 900
 height = 900
-ant_number = 90
-food_cords = (100, 250)
+ant_number = 60
+food_cords = (400, 800)
 food_number = 200
 food = []
 home_pheromones = []
 food_pheromones = []
-home = pygame.Rect(200, 400, 25, 25)
+home = pygame.Rect(100, 100, 25, 25)
 
 # Creating pygame variables
 pygame.init()
@@ -25,12 +25,24 @@ clock = pygame.time.Clock()
 
 # Creating Ants
 for i in range(ant_number):
-    ants.append(ant.Ant(home.x, home.y, 900, 900))
+    ants.append(ant.Ant(home.x, home.y, width, height))
 
 # Creating Food
 for i in range(round(math.sqrt(food_number))):
     for i2 in range(round(math.sqrt(food_number))):
         food.append(pygame.Rect(food_cords[0] + i, food_cords[1] + i2, 5, 5))
+'''
+ir = 0
+for i in range(15):
+    ir += 1
+    food_pheromones.append(pheromone_food.pheromone(food_cords[0], food_cords[1]+i*20, ir))
+
+#Adding food pheromoes
+for i in range(15):
+    ir += 1
+    food_pheromones.append(pheromone_food.pheromone(food_cords[0]+(i*20), home.y, ir))
+
+'''
 
 running = True
 while running:
@@ -75,39 +87,42 @@ while running:
             ant.ant.move_ip(0, -1)
 
         if ant.target == (ant.ant.x, ant.ant.y):
-            ant.target = (random.randint(0, round(width/2)), random.randint(0, round(height/2)))
+            ant.target = (random.randint(0, width), random.randint(0, height))
 
+        # increasing distance form nest/food
+        ant.distance += 1
 
         # Testing if Ant collides
         if ant.ant.collidelist(food) != -1 and ant.having_food == 2:
             food.pop(ant.ant.collidelist(food))
             ant.having_food = 1
             ant.sensoring_pheromones(home_pheromones)
+            ant.distance = 0
         if ant.ant.colliderect(home) is True and ant.having_food == 3:
             ant.having_food = 0
             ant.sensoring_pheromones(food_pheromones)
-        if ant.ant.x > width:
-            ant.target = (random.randint(-width+10, 0), ant.target[1])
-        if ant.ant.x > height:
-            ant.target = (ant.target[0], random.randint(-height+10, 0))
+            ant.distance = 0
+            print(len(food))
+        if ant.ant.x > width or ant.ant.x < 0:
+            ant.target = (random.randint(0, width), ant.target[1])
+        if ant.ant.y > height or ant.ant.y < 0:
+            ant.target = (ant.target[0], random.randint(0, width))
 
 
         # spreading pheromones
         if ant.pheromone_time == 0:
             if ant.having_food == 1 or ant.having_food == 3:
-                food_pheromones.append(pheromone_food.pheromone(ant.ant.x, ant.ant.y))
+                food_pheromones.append(pheromone_food.pheromone(ant.ant.x, ant.ant.y, ant.distance))
             if ant.having_food == 0 or ant.having_food == 2:
-                home_pheromones.append(pheromone_home.pheromone(ant.ant.x, ant.ant.y))
-            ant.pheromone_time = 5
+                home_pheromones.append(pheromone_home.pheromone(ant.ant.x, ant.ant.y, ant.distance))
+            ant.pheromone_time = 20
         ant.pheromone_time -= 1
 
         # Sensoring pheromones
-        if ant.having_food == 0 and ant.dected == 0:
-            ant.dected = 10
+        if ant.having_food == 0:
             ant.sensoring_pheromones(food_pheromones)
-        elif ant.having_food == 1 and ant.dected == 0:
-            ant.dected = 10
-        ant.dected -= 1
+        elif ant.having_food == 1:
+            ant.sensoring_pheromones(home_pheromones)
 
 
         # seeing food
@@ -118,7 +133,6 @@ while running:
         if rect.colliderect(home) is True and (ant.having_food == 1 or ant.having_food == 3):
             ant.having_food = 3
             ant.target = (home.x, home.y)
-
 
 
     pygame.display.flip()
