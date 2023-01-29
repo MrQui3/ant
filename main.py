@@ -7,7 +7,7 @@ import random
 
 # Creating simulation variables
 ants = []
-FPS = 30
+FPS = 60
 width = 900
 height = 900
 ant_number = 60
@@ -22,6 +22,7 @@ home = pygame.Rect(100, 100, 25, 25)
 pygame.init()
 screen = pygame.display.set_mode([width, height], pygame.RESIZABLE)
 clock = pygame.time.Clock()
+pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
 
 # Creating Ants
 for i in range(ant_number):
@@ -115,12 +116,13 @@ while running:
                 food_pheromones.append(pheromone_food.pheromone(ant.ant.x, ant.ant.y, ant.distance))
             if ant.having_food == 0 or ant.having_food == 2:
                 home_pheromones.append(pheromone_home.pheromone(ant.ant.x, ant.ant.y, ant.distance))
-            ant.pheromone_time = 20
+            ant.pheromone_time = 29
         ant.pheromone_time -= 1
 
         # Sensoring pheromones
-        if ant.having_food == 0:
+        if ant.having_food == 0 or ant.having_food == 2:
             ant.sensoring_pheromones(food_pheromones)
+
         elif ant.having_food == 1:
             ant.sensoring_pheromones(home_pheromones)
 
@@ -133,7 +135,6 @@ while running:
         if rect.colliderect(home) is True and (ant.having_food == 1 or ant.having_food == 3):
             ant.having_food = 3
             ant.target = (home.x, home.y)
-
 
     pygame.display.flip()
 pygame.quit()
