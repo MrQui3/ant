@@ -4,6 +4,7 @@ import ant
 import pheromone_home
 import pheromone_food
 import random
+import time
 
 # Creating simulation variables
 ants = []
@@ -12,7 +13,7 @@ width = 900
 height = 900
 ant_number = 60
 food_cords = (400, 800)
-food_number = 200
+food_number = 1000
 food = []
 home_pheromones = []
 food_pheromones = []
@@ -51,7 +52,6 @@ while running:
         if event.type == pygame.QUIT:
             running = False
     screen.fill((219, 149, 44))
-    clock.tick(FPS)
 
     # Drawing Home
     pygame.draw.rect(screen, (100, 66, 17), (home.x, home.y, home.size[0], home.size[1]))
