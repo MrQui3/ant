@@ -11,13 +11,15 @@ ants = []
 FPS = 60
 width = 900
 height = 900
-ant_number = 60
+ant_number = 1
 food_cords = (400, 800)
-food_number = 1000
+food_number = 100
+food_number2 = 50
 food = []
 home_pheromones = []
 food_pheromones = []
 home = pygame.Rect(100, 100, 25, 25)
+walls = []
 
 # Creating pygame variables
 pygame.init()
@@ -33,18 +35,25 @@ for i in range(ant_number):
 for i in range(round(math.sqrt(food_number))):
     for i2 in range(round(math.sqrt(food_number))):
         food.append(pygame.Rect(food_cords[0] + i, food_cords[1] + i2, 5, 5))
-'''
+
+for i in range(round(math.sqrt(food_number2))):
+    for i2 in range(round(math.sqrt(food_number2))):
+        food.append(pygame.Rect(100 + i, 600 + i2, 5, 5))
+
+# Creating walls
+walls.append(pygame.Rect(300, 600, 200, 10))
+
 ir = 0
-for i in range(15):
+for i in range(100):
     ir += 1
-    food_pheromones.append(pheromone_food.pheromone(food_cords[0], food_cords[1]+i*20, ir))
+    food_pheromones.append(pheromone_food.pheromone(100, 600-i*20, ir))
 
 #Adding food pheromoes
 for i in range(15):
     ir += 1
     food_pheromones.append(pheromone_food.pheromone(food_cords[0]+(i*20), home.y, ir))
 
-'''
+
 
 running = True
 while running:
@@ -56,22 +65,26 @@ while running:
     # Drawing Home
     pygame.draw.rect(screen, (100, 66, 17), (home.x, home.y, home.size[0], home.size[1]))
 
+    # Drawing Walls
+    for i in walls:
+        pygame.draw.rect(screen, (36, 35, 35), i)
 
     # Drawing Food
     for i in food:
         pygame.draw.rect(screen, (0, 255, 0), i)
 
-    # home_pheromones
+    # Drawing home_pheromones
     for i in home_pheromones:
         pygame.draw.rect(screen, (0, 0, 255), i.rect)
         i.time -= 1
     home_pheromones = [x for x in home_pheromones if x.time != 0]
 
-    # food_pheromones
+    # Drawing food_pheromones
     for i in food_pheromones:
         pygame.draw.rect(screen, (45, 112, 0), i.rect)
         i.time -= 1
     food_pheromones = [x for x in food_pheromones if x.time != 0]
+
 
     # Ants
     for ant in ants:
@@ -107,7 +120,9 @@ while running:
         if ant.ant.x > width or ant.ant.x < 0:
             ant.target = (random.randint(0, width), ant.target[1])
         if ant.ant.y > height or ant.ant.y < 0:
-            ant.target = (ant.target[0], random.randint(0, width))
+            ant.target = (ant.target[0], random.randint(0, height))
+        if ant.ant.collidelist(walls) != -1:
+            ant.target = (random.randint(0, width), random.randint(0, height))
 
 
         # spreading pheromones

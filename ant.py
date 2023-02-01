@@ -21,7 +21,7 @@ class Ant:
         for i in food_pheromones:
             if checking_rect.colliderect(i.rect) is True and i.distance_from_nest < smallest_pheromone:
                 smallest_pheromone = i.distance_from_nest
-                self.target = (i.rect.x + random.randint(-20, 20), i.rect.y + random.randint(-20, 20))
+                self.target = (i.rect.x + random.randint(-10, 10), i.rect.y + random.randint(-10, 10))
 
 
 
