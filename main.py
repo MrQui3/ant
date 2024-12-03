@@ -2,7 +2,6 @@ import math
 import pygame
 from ant_class import Ant
 from pheromone import Pheromone
-import random
 import time
 
 # Creating simulation variables
@@ -10,7 +9,7 @@ ants = []
 FPS = 120
 width = 800
 height = 800
-ant_number = 20
+ant_number = 10
 food = []
 home_pheromones = [[], []]
 food_pheromones = [[], []]
@@ -19,7 +18,7 @@ walls = []
 
 # Creating pygame variables
 pygame.init()
-screen = pygame.display.set_mode([width, height], pygame.RESIZABLE)
+screen = pygame.display.set_mode([width+5, height+5], pygame.RESIZABLE)
 pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
 
 # Creating Ants
@@ -31,7 +30,7 @@ for i in range(round(ant_number / len(homes))):
 # Creating Food
 for i in range(round(math.sqrt(20))):
     for i2 in range(round(math.sqrt(50))):
-        food.append([700 + i, 500 + i2])
+        food.append([200 + i, 200 + i2])
 
 for i in range(round(math.sqrt(20))):
     for i2 in range(round(math.sqrt(50))):
@@ -82,11 +81,11 @@ def drawing():
     # Drawing Ants
     for ant in ants:
         if ant.nest == 0:
-            pygame.draw.rect(screen, (255, 0, 255), (ant.cords[0], ant.cords[1], 5, 10))
+            pygame.draw.rect(screen, (255, 0, 255), (ant.cords[0], ant.cords[1], ant.size[0], ant.size[1]))
         elif ant.nest == 1:
-            pygame.draw.rect(screen, (255, 0, 0), (ant.cords[0], ant.cords[1], 5, 10))
+            pygame.draw.rect(screen, (255, 0, 0), (ant.cords[0], ant.cords[1], ant.size[0], ant.size[1]))
         else:
-            pygame.draw.rect(screen, (255, 255, 255), (ant.cords[0], ant.cords[1], 5, 10))
+            pygame.draw.rect(screen, (255, 255, 255), (ant.cords[0], ant.cords[1], ant.size[0], ant.size[1]))
 
 
 def calculating():
@@ -111,11 +110,23 @@ def calculating():
 
         ant.move()
 
+        # Testing if Ant sees food_pheromones
+        if ant.having_food == 0:
+            ant.smelling_pheromones(food_pheromones[ant.nest])
+
+        # Testing if Ant sees home/home_pheromones
+        elif ant.having_food == 1:
+            if ant.testing_searching(homes[ant.nest]):
+                ant.having_food = 3
+                ant.target = homes[ant.nest]
+            else:
+                ant.smelling_pheromones(home_pheromones[ant.nest])
+
         # Testing if Ant collides/sees with food
         if ant.having_food == 2 or ant.having_food == 0:
             for i in food:
                 # Testing if Ant collides with food
-                if ant.seeing_objects(i):
+                if ant.colliding_objects(i, [5, 5]):
                     food.remove(i)
                     ant.having_food = 1
                     ant.smelling_pheromones(home_pheromones[ant.nest])
@@ -128,21 +139,12 @@ def calculating():
 
         # Testing if Ant collides with home
         elif ant.having_food == 3:
-            if ant.testing_searching(homes[ant.nest]):
+            if ant.colliding_objects(homes[ant.nest], [25, 25]):
                 ant.distance = 0
                 ant.having_food = 0
                 ant.smelling_pheromones(food_pheromones[ant.nest])
 
-        # Testing if Ant sees home/home_pheromones
-        elif ant.having_food == 1:
-            if ant.seeing_objects(homes[ant.nest]):
-                ant.having_food = 3
-                ant.target = homes[ant.nest]
-            else:
-                ant.smelling_pheromones(home_pheromones[ant.nest])
 
-        elif ant.having_food == 0:
-            ant.smelling_pheromones(food_pheromones[ant.nest])
 
         # spreading pheromones
         if ant.pheromone_time == 0:
@@ -150,7 +152,7 @@ def calculating():
                 food_pheromones[ant.nest].append(Pheromone(ant.cords, ant.distance))
             if ant.having_food == 0 or ant.having_food == 2:
                 home_pheromones[ant.nest].append(Pheromone(ant.cords, ant.distance))
-            ant.pheromone_time = 31
+            ant.pheromone_time = 16
         ant.pheromone_time -= 1
 
 
@@ -167,5 +169,4 @@ while running:
             running = False
 
     main()
-    time.sleep(1 / FPS)
 pygame.quit()
