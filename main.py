@@ -7,10 +7,10 @@ import time
 
 # Creating simulation variables
 ants = []
-FPS = 30
+FPS = 120
 width = 800
 height = 800
-ant_number = 2
+ant_number = 20
 food = []
 home_pheromones = [[], []]
 food_pheromones = [[], []]
@@ -31,7 +31,7 @@ for i in range(round(ant_number / len(homes))):
 # Creating Food
 for i in range(round(math.sqrt(20))):
     for i2 in range(round(math.sqrt(50))):
-        food.append([200 + i, 200 + i2])
+        food.append([700 + i, 500 + i2])
 
 for i in range(round(math.sqrt(20))):
     for i2 in range(round(math.sqrt(50))):
@@ -111,33 +111,38 @@ def calculating():
 
         ant.move()
 
-        # Testing if Ant collides with food
+        # Testing if Ant collides/sees with food
         if ant.having_food == 2 or ant.having_food == 0:
             for i in food:
-                if ant.testing_searching(i):
+                # Testing if Ant collides with food
+                if ant.seeing_objects(i):
                     food.remove(i)
                     ant.having_food = 1
                     ant.smelling_pheromones(home_pheromones[ant.nest])
                     ant.distance = 0
                     break
                 # Testing if Ant sees food
-                if ant.seeing_objects(i):
+                if ant.testing_searching(i):
                     ant.target = i
                     ant.having_food = 2
 
         # Testing if Ant collides with home
-        if ant.having_food == 3:
+        elif ant.having_food == 3:
             if ant.testing_searching(homes[ant.nest]):
                 ant.distance = 0
                 ant.having_food = 0
                 ant.smelling_pheromones(food_pheromones[ant.nest])
-        # Testing if Ant sees home
-        if ant.having_food == 1:
+
+        # Testing if Ant sees home/home_pheromones
+        elif ant.having_food == 1:
             if ant.seeing_objects(homes[ant.nest]):
                 ant.having_food = 3
                 ant.target = homes[ant.nest]
             else:
                 ant.smelling_pheromones(home_pheromones[ant.nest])
+
+        elif ant.having_food == 0:
+            ant.smelling_pheromones(food_pheromones[ant.nest])
 
         # spreading pheromones
         if ant.pheromone_time == 0:
@@ -148,13 +153,6 @@ def calculating():
             ant.pheromone_time = 31
         ant.pheromone_time -= 1
 
-        # Sensoring pheromones
-        if ant.having_food == 0:
-            ant.smelling_pheromones(food_pheromones[ant.nest])
-
-        elif ant.having_food == 1:
-            ant.smelling_pheromones(food_pheromones[ant.nest])
-
 
 def main():
     calculating()
@@ -162,7 +160,7 @@ def main():
     pygame.display.flip()
 
 
-running = False
+running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -170,13 +168,4 @@ while running:
 
     main()
     time.sleep(1 / FPS)
-
-
-# Laufzeit berechnen
-a = time.time()
-for i in range(1000):
-    calculating()
-
-print(time.time() - a)
-
 pygame.quit()

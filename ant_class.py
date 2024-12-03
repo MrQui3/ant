@@ -36,8 +36,8 @@ class Ant:
         self.distance += 1
 
     def testing_searching(self, object: list):
-        if (self.cords[0] + 5 >= object[0] >= self.cords[0] - 5 and
-                self.cords[1] + 5 >= object[1] >= self.cords[1] - 5):
+        if (self.cords[0] + self.search_radius * 2 >= object[0] >= self.cords[0] - self.search_radius * 2 and
+                self.cords[1] + self.search_radius * 2 >= object[1] >= self.cords[1] - self.search_radius * 2):
             return True
         return False
 
@@ -50,7 +50,7 @@ class Ant:
                 self.target = [pheromone.rect.x + random.randint(-10, 10), pheromone.rect.y + random.randint(-10, 10)]
 
     def seeing_objects(self, object: list):
-        if (self.cords[0] + self.search_radius*2 >= object[0] >= self.cords[0] - self.search_radius*2 and
-                self.cords[1] + self.search_radius*2 >= object[1] >= self.cords[1] - self.search_radius*2):
+        if (self.cords[0] + 5 >= object[0] >= self.cords[0] - 5 and
+                self.cords[1] + 5 >= object[1] >= self.cords[1] - 5):
             return True
         return False
