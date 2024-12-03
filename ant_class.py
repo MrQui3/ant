@@ -45,22 +45,12 @@ class Ant:
         smallest_pheromone_distance = 1000000
 
         for pheromone in pheromones:
-            if self.testing_searching(pheromone.cords) and pheromone.pheromone_distance < smallest_pheromone_distance:
+            if self.testing_searching([pheromone.rect.x, pheromone.rect.y]) and pheromone.pheromone_distance < smallest_pheromone_distance:
                 smallest_pheromone_distance = pheromone.pheromone_distance
-                self.target = [pheromone.cords[0] + random.randint(-10, 10), pheromone.cords[1] + random.randint(-10, 10)]
+                self.target = [pheromone.rect.x + random.randint(-10, 10), pheromone.rect.y + random.randint(-10, 10)]
 
     def seeing_objects(self, object: list):
         if (self.cords[0] + self.search_radius*2 >= object[0] >= self.cords[0] - self.search_radius*2 and
                 self.cords[1] + self.search_radius*2 >= object[1] >= self.cords[1] - self.search_radius*2):
             return True
         return False
-
-    '''def sensoring_pheromones(self, pheromones: list):
-        checking_rect = pygame.Rect(self.cords[0], self.cords[1]-30, 70, 70)
-        smallest_pheromone = 1000000
-
-        for i in pheromones:
-            if self.cords[0] + 31 >= i.rect.x >= self.cords[1] - 31:
-                if checking_rect.colliderect(i.rect) is True and i.distance_from_nest < smallest_pheromone and i.nest == self.nest:
-                    smallest_pheromone = i.distance_from_nest
-                    self.target = (i.rect.x + random.randint(-10, 10), i.rect.y + random.randint(-10, 10))'''

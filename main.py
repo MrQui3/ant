@@ -10,13 +10,12 @@ ants = []
 FPS = 30
 width = 800
 height = 800
-ant_number = 10
+ant_number = 2
 food = []
 home_pheromones = [[], []]
 food_pheromones = [[], []]
 homes = [[100, 100], [700, 100]]
 walls = []
-
 
 # Creating pygame variables
 pygame.init()
@@ -24,15 +23,15 @@ screen = pygame.display.set_mode([width, height], pygame.RESIZABLE)
 pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
 
 # Creating Ants
-for i in range(round(ant_number/len(homes))):
+for i in range(round(ant_number / len(homes))):
     ants.append(Ant(homes[0][0], homes[0][1], width, height, 0))
-for i in range(round(ant_number/len(homes))):
+for i in range(round(ant_number / len(homes))):
     ants.append(Ant(homes[1][0], homes[1][1], width, height, 1))
 
 # Creating Food
 for i in range(round(math.sqrt(20))):
     for i2 in range(round(math.sqrt(50))):
-        food.append([700 + i, 500 + i2])
+        food.append([200 + i, 200 + i2])
 
 for i in range(round(math.sqrt(20))):
     for i2 in range(round(math.sqrt(50))):
@@ -41,7 +40,6 @@ for i in range(round(math.sqrt(20))):
 for i in range(round(math.sqrt(50))):
     for i2 in range(round(math.sqrt(100))):
         food.append([300 + i, 700 + i2])
-
 
 # Creating walls
 walls.append(pygame.Rect(300, 600, 200, 10))
@@ -138,6 +136,8 @@ def calculating():
             if ant.seeing_objects(homes[ant.nest]):
                 ant.having_food = 3
                 ant.target = homes[ant.nest]
+            else:
+                ant.smelling_pheromones(home_pheromones[ant.nest])
 
         # spreading pheromones
         if ant.pheromone_time == 0:
@@ -156,21 +156,27 @@ def calculating():
             ant.smelling_pheromones(food_pheromones[ant.nest])
 
 
-
 def main():
     calculating()
     drawing()
     pygame.display.flip()
 
 
-
-running = True
+running = False
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
     main()
-    time.sleep(1/FPS)
+    time.sleep(1 / FPS)
+
+
+# Laufzeit berechnen
+a = time.time()
+for i in range(1000):
+    calculating()
+
+print(time.time() - a)
 
 pygame.quit()
