@@ -14,6 +14,7 @@ class Ant:
         # Distance from nest/food
         self.distance = 0
 
+        self.last_pheromone_distance = math.inf
 
         self.pygame_width = pygame_width
         self.pygame_height = pygame_height
@@ -48,8 +49,8 @@ class Ant:
     def smelling_pheromones(self, pheromones: list):
         shortest_pheromone_time = math.inf
         for pheromone in pheromones:
-            if self.testing_searching([pheromone.rect.x, pheromone.rect.y]) and pheromone.pheromone_distance < shortest_pheromone_time:
-                shortest_pheromone_time = pheromone.pheromone_distance
+            if self.testing_searching([pheromone.rect.x, pheromone.rect.y]) and pheromone.pheromone_distance < self.last_pheromone_distance:
+                self.last_pheromone_distance = pheromone.pheromone_distance
                 self.target = [pheromone.rect.x + random.randint(-30, 30), pheromone.rect.y + random.randint(-30, 30)]
 
 

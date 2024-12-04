@@ -20,6 +20,9 @@ walls = []
 pygame.init()
 screen = pygame.display.set_mode([width+5, height+5], pygame.RESIZABLE)
 pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
+font = pygame.font.Font(None, 36)  # None for default font, 36 is the font size
+
+
 
 # Creating Ants
 for i in range(round(ant_number / len(homes))):
@@ -30,7 +33,7 @@ for i in range(round(ant_number / len(homes))):
 # Creating Food
 for i in range(round(math.sqrt(20))):
     for i2 in range(round(math.sqrt(50))):
-        food.append([200 + i, 200 + i2])
+        food.append([700 + i, 500 + i2])
 
 for i in range(round(math.sqrt(20))):
     for i2 in range(round(math.sqrt(50))):
@@ -131,6 +134,7 @@ def calculating():
                     ant.having_food = 1
                     ant.smelling_pheromones(home_pheromones[ant.nest])
                     ant.distance = 0
+                    ant.last_pheromone_distance = math.inf
                     break
                 # Testing if Ant sees food
                 if ant.testing_searching(i):
@@ -142,7 +146,9 @@ def calculating():
             if ant.colliding_objects(homes[ant.nest], [25, 25]):
                 ant.distance = 0
                 ant.having_food = 0
+                ant.last_pheromone_distance = math.inf
                 ant.smelling_pheromones(food_pheromones[ant.nest])
+                ants.append(Ant(homes[ant.nest][0], homes[ant.nest][1], width, height, ant.nest))
 
 
 
@@ -153,12 +159,17 @@ def calculating():
             if ant.having_food == 0 or ant.having_food == 2:
                 home_pheromones[ant.nest].append(Pheromone(ant.cords, ant.distance))
             ant.pheromone_time = 16
+            ant.last_pheromone_distance += 0.5
         ant.pheromone_time -= 1
 
 
 def main():
     calculating()
+    calculating()
+    calculating()
     drawing()
+    text = font.render(str(len(ants)), True, (0, 0, 0))
+    screen.blit(text, (width / 2-30, 50))
     pygame.display.flip()
 
 
@@ -168,5 +179,8 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+
+
     main()
+
 pygame.quit()
