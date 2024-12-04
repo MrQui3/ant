@@ -4,49 +4,51 @@ from ant_class import Ant
 from pheromone import Pheromone
 import time
 
-# Creating simulation variables
-ants = []
-FPS = 120
-width = 800
-height = 800
-ant_number = 10
-food = []
-home_pheromones = [[], []]
-food_pheromones = [[], []]
-homes = [[100, 100], [700, 100]]
-walls = []
 
-# Creating pygame variables
-pygame.init()
-screen = pygame.display.set_mode([width+5, height+5], pygame.RESIZABLE)
-pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
-font = pygame.font.Font(None, 36)  # None for default font, 36 is the font size
+def setting_variables():
+    global ants, FPS, width, height, ant_number, food, home_pheromones, food_pheromones, homes, walls, screen, font
 
+    # Creating simulation variables
+    ants = []
+    FPS = 120
+    width = 800
+    height = 800
+    ant_number = 10
+    food = []
+    home_pheromones = [[], []]
+    food_pheromones = [[], []]
+    homes = [[100, 100], [700, 100]]
+    walls = []
 
+    # Creating pygame variables
+    pygame.init()
+    screen = pygame.display.set_mode([width + 5, height + 5], pygame.RESIZABLE)
+    pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
+    font = pygame.font.Font(None, 36)  # None for default font, 36 is the font size
 
-# Creating Ants
-for i in range(round(ant_number / len(homes))):
-    ants.append(Ant(homes[0][0], homes[0][1], width, height, 0))
-for i in range(round(ant_number / len(homes))):
-    ants.append(Ant(homes[1][0], homes[1][1], width, height, 1))
+    # Creating Ants
+    for i in range(round(ant_number / len(homes))):
+        ants.append(Ant(homes[0][0], homes[0][1], width, height, 0))
+    for i in range(round(ant_number / len(homes))):
+        ants.append(Ant(homes[1][0], homes[1][1], width, height, 1))
 
-# Creating Food
-for i in range(round(math.sqrt(20))):
-    for i2 in range(round(math.sqrt(50))):
-        food.append([700 + i, 500 + i2])
+    # Creating Food
+    for i in range(round(math.sqrt(20))):
+        for i2 in range(round(math.sqrt(50))):
+            food.append([700 + i, 500 + i2])
 
-for i in range(round(math.sqrt(20))):
-    for i2 in range(round(math.sqrt(50))):
-        food.append([100 + i, 500 + i2])
+    for i in range(round(math.sqrt(20))):
+        for i2 in range(round(math.sqrt(50))):
+            food.append([100 + i, 500 + i2])
 
-for i in range(round(math.sqrt(50))):
-    for i2 in range(round(math.sqrt(100))):
-        food.append([300 + i, 700 + i2])
+    for i in range(round(math.sqrt(50))):
+        for i2 in range(round(math.sqrt(100))):
+            food.append([300 + i, 700 + i2])
 
-# Creating walls
-walls.append(pygame.Rect(300, 600, 200, 10))
-walls.append(pygame.Rect(300, 600, 10, 50))
-walls.append(pygame.Rect(500, 600, 10, 50))
+    # Creating walls
+    walls.append(pygame.Rect(300, 600, 200, 10))
+    walls.append(pygame.Rect(300, 600, 10, 50))
+    walls.append(pygame.Rect(500, 600, 10, 50))
 
 
 def drawing():
@@ -150,8 +152,6 @@ def calculating():
                 ant.smelling_pheromones(food_pheromones[ant.nest])
                 ants.append(Ant(homes[ant.nest][0], homes[ant.nest][1], width, height, ant.nest))
 
-
-
         # spreading pheromones
         if ant.pheromone_time == 0:
             if ant.having_food == 1 or ant.having_food == 3:
@@ -164,23 +164,23 @@ def calculating():
 
 
 def main():
-    calculating()
-    calculating()
-    calculating()
-    drawing()
-    text = font.render(str(len(ants)), True, (0, 0, 0))
-    screen.blit(text, (width / 2-30, 50))
-    pygame.display.flip()
+    setting_variables()
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        calculating()
+        calculating()
+        calculating()
+        drawing()
+        text = font.render(str(len(ants)), True, (0, 0, 0))
+        screen.blit(text, (width / 2 - 30, 50))
+        pygame.display.flip()
+
+    pygame.quit()
 
 
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-
-
+if __name__ == '__main__':
     main()
-
-pygame.quit()
