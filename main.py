@@ -3,22 +3,23 @@ import pygame
 from ant_class import Ant
 from pheromone import Pheromone
 import time
+import numpy as np
 
 
 def setting_variables():
     global ants, FPS, width, height, ant_number, food, home_pheromones, food_pheromones, homes, walls, screen, font
 
     # Creating simulation variables
-    ants = []
+    ants = np.array([])
     FPS = 120
     width = 800
     height = 800
     ant_number = 10
-    food = []
-    home_pheromones = [[], []]
-    food_pheromones = [[], []]
-    homes = [[100, 100], [700, 100]]
-    walls = []
+    food = np.array([], dtype=int).reshape(0, 2)
+    home_pheromones = np.array([[], []])
+    food_pheromones = np.array([[], []])
+    homes = np.array([[100, 100], [700, 100]])
+    walls = np.array([])
 
     # Creating pygame variables
     pygame.init()
@@ -28,27 +29,23 @@ def setting_variables():
 
     # Creating Ants
     for i in range(round(ant_number / len(homes))):
-        ants.append(Ant(homes[0][0], homes[0][1], width, height, 0))
+        ants = np.append(ants, Ant(homes[0][0], homes[0][1], width, height, 0))
     for i in range(round(ant_number / len(homes))):
-        ants.append(Ant(homes[1][0], homes[1][1], width, height, 1))
+        ants = np.append(ants, Ant(homes[0][0], homes[0][1], width, height, 0))
 
     # Creating Food
     for i in range(round(math.sqrt(20))):
         for i2 in range(round(math.sqrt(50))):
-            food.append([700 + i, 500 + i2])
+            food = np.append(food, [[700 + i, 500 + i2]], axis=0)
 
     for i in range(round(math.sqrt(20))):
         for i2 in range(round(math.sqrt(50))):
-            food.append([100 + i, 500 + i2])
+            food = np.append(food, [[100 + i, 500 + i2]], axis=0)
 
     for i in range(round(math.sqrt(50))):
         for i2 in range(round(math.sqrt(100))):
-            food.append([300 + i, 700 + i2])
+            food = np.append(food, [[300 + i, 700 + i2]], axis=0)
 
-    # Creating walls
-    walls.append(pygame.Rect(300, 600, 200, 10))
-    walls.append(pygame.Rect(300, 600, 10, 50))
-    walls.append(pygame.Rect(500, 600, 10, 50))
 
 
 def drawing():
@@ -94,13 +91,15 @@ def drawing():
 
 
 def calculating():
-    global home_pheromones, food_pheromones
+    global home_pheromones, food_pheromones, ants, food
 
     # Calculating home_pheromones
     for pheromone_types in home_pheromones:
         for pheromone in pheromone_types:
             pheromone.time -= 1
             if pheromone.time == 0:
+                index_to_delete = np.where((food == i).all(axis=1))[0]
+                food = np.delete(food, index_to_delete, axis=0)
                 pheromone_types.remove(pheromone)
 
     # Calculating food_pheromones
@@ -132,7 +131,8 @@ def calculating():
             for i in food:
                 # Testing if Ant collides with food
                 if ant.colliding_objects(i, [5, 5]):
-                    food.remove(i)
+                    index_to_delete = np.where((food == i).all(axis=1))[0]
+                    food = np.delete(food, index_to_delete, axis=0)
                     ant.having_food = 1
                     ant.smelling_pheromones(home_pheromones[ant.nest])
                     ant.distance = 0
@@ -150,14 +150,14 @@ def calculating():
                 ant.having_food = 0
                 ant.last_pheromone_distance = math.inf
                 ant.smelling_pheromones(food_pheromones[ant.nest])
-                ants.append(Ant(homes[ant.nest][0], homes[ant.nest][1], width, height, ant.nest))
+                ants = np.append(ants, Ant(homes[ant.nest][0], homes[ant.nest][1], width, height, ant.nest))
 
         # spreading pheromones
         if ant.pheromone_time == 0:
             if ant.having_food == 1 or ant.having_food == 3:
-                food_pheromones[ant.nest].append(Pheromone(ant.cords, ant.distance))
+                food_pheromones[ant.nest] = np.append(food_pheromones[ant.nest], Pheromone(ant.cords, ant.distance))
             if ant.having_food == 0 or ant.having_food == 2:
-                home_pheromones[ant.nest].append(Pheromone(ant.cords, ant.distance))
+                home_pheromones[ant.nest] = np.append(home_pheromones[ant.nest], Pheromone(ant.cords, ant.distance))
             ant.pheromone_time = 16
             ant.last_pheromone_distance += 0.5
         ant.pheromone_time -= 1
@@ -171,9 +171,6 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
-        calculating()
-        calculating()
-        calculating()
         drawing()
         text = font.render(str(len(ants)), True, (0, 0, 0))
         screen.blit(text, (width / 2 - 30, 50))
