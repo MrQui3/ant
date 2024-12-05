@@ -23,7 +23,7 @@ class Ant:
 
         self.search_radius = 31
 
-        self.target = self.new_target()
+        self.target = [300, 300]
 
     def move(self):
         if self.target[0] > self.cords[0]:
@@ -47,9 +47,10 @@ class Ant:
         return False
 
     def smelling_pheromones(self, pheromones: list):
-        shortest_pheromone_time = math.inf
         for pheromone in pheromones:
-            if self.testing_searching([pheromone.rect.x, pheromone.rect.y]) and pheromone.pheromone_distance < self.last_pheromone_distance:
+            if pheromone.pheromone_distance > self.last_pheromone_distance:
+                break
+            if self.testing_searching([pheromone.rect.x, pheromone.rect.y]):
                 self.last_pheromone_distance = pheromone.pheromone_distance
                 self.target = [pheromone.rect.x + random.randint(-30, 30), pheromone.rect.y + random.randint(-30, 30)]
 

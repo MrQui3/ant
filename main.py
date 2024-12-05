@@ -10,7 +10,7 @@ def setting_variables():
 
     # Creating simulation variables
     ants = []
-    FPS = 120
+    FPS = 60
     width = 800
     height = 800
     ant_number = 10
@@ -161,6 +161,10 @@ def calculating():
             ant.pheromone_time = 16
             ant.last_pheromone_distance += 0.5
         ant.pheromone_time -= 1
+    for i in range(len(home_pheromones)):
+        home_pheromones[i].sort(key=lambda x: x.pheromone_distance)
+    for i in range(len(food_pheromones)):
+        food_pheromones[i].sort(key=lambda x: x.pheromone_distance)
 
 
 def main():
