@@ -43,12 +43,10 @@ def setting_variables():
 
     for i in range(round(math.sqrt(50))):
         for i2 in range(round(math.sqrt(100))):
-            food.append([300 + i, 700 + i2])
+            food.append([400 + i, 700 + i2])
 
-    # Creating walls
-    walls.append(pygame.Rect(300, 600, 200, 10))
-    walls.append(pygame.Rect(300, 600, 10, 50))
-    walls.append(pygame.Rect(500, 600, 10, 50))
+    for i in range(10):
+        walls.append([150 + i * 50, 600])
 
 
 def drawing():
@@ -61,7 +59,7 @@ def drawing():
 
     # Drawing Walls
     for wall in walls:
-        pygame.draw.rect(screen, (36, 35, 35), wall)
+        pygame.draw.rect(screen, (36, 35, 35), (wall[0], wall[1], 50, 50))
 
     # Drawing Food
     for i in food:
@@ -113,6 +111,15 @@ def calculating():
     # Ants
     for ant in ants:
 
+        # testing if ant collides with walls
+        is_in_wall = False
+        for wall in walls:
+            if ant.colliding_objects(wall, [50, 50]):
+                ant.target = ant.new_target()
+                is_in_wall = True
+        if is_in_wall:
+            ant.move()
+            continue
         ant.move()
 
         # Testing if Ant sees food_pheromones
