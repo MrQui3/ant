@@ -5,3 +5,6 @@ class Pheromone:
         self.pheromone_distance = distance
         self.time = 1200
         self.rect = pygame.Rect(cords[0], cords[1], 2, 2)
+
+    def to_dict(self):
+        return {"cords": (self.rect.x, self.rect.y)}

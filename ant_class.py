@@ -73,3 +73,6 @@ class Ant:
             target[1] = 0
 
         return target
+
+    def to_dict(self):
+        return {"cords": self.cords, "size": self.size}

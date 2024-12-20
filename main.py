@@ -2,7 +2,8 @@ import math
 import pygame
 from ant_class import Ant
 from pheromone import Pheromone
-import time
+import json
+import copy
 
 
 def setting_variables():
@@ -173,24 +174,60 @@ def calculating():
     for i in range(len(food_pheromones)):
         food_pheromones[i].sort(key=lambda x: x.pheromone_distance)
 
+def serialize_object(obj):
+    if hasattr(obj, "to_dict"):  # Wenn das Objekt eine to_dict-Methode hat
+        return obj.to_dict()
+    else:
+        raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
+
+
+def compare_dicts(dict1, dict2):
+    """Vergleicht zwei Dictionaries und gibt die Unterschiede zurück."""
+    changes = {"added": {}, "removed": {}, "modified": {}}
+
+    # Vergleiche Schlüssel in dict1 und dict2
+    all_keys = set(dict1.keys()).union(set(dict2.keys()))
+
+    for key in all_keys:
+        if key not in dict1:
+            # Der Schlüssel existiert nur in dict2 (neu hinzugefügt)
+            changes["added"][key] = dict2[key]
+        elif key not in dict2:
+            # Der Schlüssel existiert nur in dict1 (entfernt)
+            changes["removed"][key] = dict1[key]
+        else:
+            # Der Schlüssel existiert in beiden, vergleiche die Werte
+            if dict1[key] != dict2[key]:
+                if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
+                    # Rekursiver Vergleich, wenn es sich um ein Dictionary handelt
+                    changes["modified"][key] = compare_dicts(dict1[key], dict2[key])
+                else:
+                    changes["modified"][key] = {"old": dict1[key], "new": dict2[key]}
+
+    return changes
+
+
 
 def main():
     setting_variables()
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
 
+    old_data = {
+        "ants": copy.deepcopy(ants),
+        "food_pheromones": copy.deepcopy(food_pheromones),
+        "home_pheromones": copy.deepcopy(home_pheromones),
+        "food": copy.deepcopy(food)
+    }
+    for i in range(10000):
         calculating()
-        calculating()
-        calculating()
-        drawing()
-        text = font.render(str(len(ants)), True, (0, 0, 0))
-        screen.blit(text, (width / 2 - 30, 50))
-        pygame.display.flip()
+    new_data = {
+        "ants": copy.deepcopy(ants),
+        "food_pheromones": copy.deepcopy(food_pheromones),
+        "home_pheromones": copy.deepcopy(home_pheromones),
+        "food": copy.deepcopy(food)
+    }
+    print(compare_dicts(old_data, new_data))
 
-    pygame.quit()
+
 
 
 if __name__ == '__main__':
